@@ -1,0 +1,38 @@
+name: app_bienestarmisena_v1
+description: "Aplicación Flutter para Bienestar Mi SENA"
+publish_to: 'none'  # No se publica en pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"  # Compatible con cualquier Dart 3.x
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 📦 Paquetes externos actualizados
+  cupertino_icons: ^1.0.8             # Íconos estilo iOS
+  get: ^4.6.6                         # State management (GetX)
+  http: ^1.5.0                        # Peticiones HTTP (actualizado)
+  font_awesome_flutter: ^10.7.0       # Íconos FontAwesome (última versión estable)
+  awesome_dialog: ^3.2.0              # Diálogos elegantes estilo SweetAlert2
+  url_launcher: ^6.3.0                # Abrir enlaces externos
+  carousel_slider: ^5.1.1             # Carrusel de imágenes
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0               # Reglas de linting actualizadas a Dart 3.4+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/img/convo2.png
+    - assets/img/cienciasSalud.jpg
+    - assets/img/produ.jpg
+    - assets/img/jove.jpg
+    - assets/img/ejeq.png
+    - assets/img/maxresdefault.jpg
+    - assets/img/sena.png
