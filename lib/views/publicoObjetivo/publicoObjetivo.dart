@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/publicoObjetivo_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/publico/publico_controller.dart';
 import 'package:app_bienestarmisena_v1/models/publicoObejtivoModel/publicoObjetivo.dart';
 import 'package:app_bienestarmisena_v1/views/publicoObjetivo/crearPublicoObjetivo.dart';
 import 'package:app_bienestarmisena_v1/views/publicoObjetivo/editarPublicoObjetivo.dart';

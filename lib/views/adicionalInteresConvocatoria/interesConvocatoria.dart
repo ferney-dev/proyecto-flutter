@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/interesAdicionalConvocatoria_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/interes/interes_adicional_controller.dart';
 import 'package:app_bienestarmisena_v1/models/interesAdicionalConvocatoriaModel/interesAdicionalConvocatoria.dart';
 import 'package:app_bienestarmisena_v1/views/adicionalInteresConvocatoria/crearInteresConvocatoria.dart';
 import 'package:app_bienestarmisena_v1/views/adicionalInteresConvocatoria/editarInteresConvocatoria.dart';

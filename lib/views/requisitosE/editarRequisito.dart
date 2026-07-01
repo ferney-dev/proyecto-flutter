@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/requisitos_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/requisitos/requisitos_controller.dart';
 import 'package:app_bienestarmisena_v1/models/requisitosModel/requisitos.dart';
 import 'package:flutter/material.dart';
 

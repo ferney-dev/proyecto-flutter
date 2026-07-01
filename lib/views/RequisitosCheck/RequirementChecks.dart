@@ -2,7 +2,7 @@ import 'package:app_bienestarmisena_v1/models/requerimientosChequeos/requirement
 import 'package:app_bienestarmisena_v1/views/RequisitosCheck/crearRequirementCheck.dart';
 import 'package:app_bienestarmisena_v1/views/RequisitosCheck/editarRequirementCheck.dart';
 import 'package:flutter/material.dart';
-import 'package:app_bienestarmisena_v1/controllers/requirement_check_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/requisitos/requirement_check_controller.dart';
 
 class ViewRequirementChecks extends StatefulWidget {
   const ViewRequirementChecks({super.key});

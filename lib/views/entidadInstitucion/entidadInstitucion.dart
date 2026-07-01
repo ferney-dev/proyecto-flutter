@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/entidadInstitucion_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/entidad/entidad_controller.dart';
 import 'package:app_bienestarmisena_v1/models/entidadInstitucion/entidadInstitucionModel.dart';
 import 'package:app_bienestarmisena_v1/views/entidadInstitucion/crearEntidadInstitucion.dart';
 import 'package:app_bienestarmisena_v1/views/entidadInstitucion/editarEntidadInstitucion.dart';

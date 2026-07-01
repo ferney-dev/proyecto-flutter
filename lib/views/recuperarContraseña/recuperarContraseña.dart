@@ -1,6 +1,10 @@
-import 'dart:convert';
+import 'package:app_bienestarmisena_v1/components/recuperar/recuperar_button.dart';
+import 'package:app_bienestarmisena_v1/components/recuperar/recuperar_form_field.dart';
+import 'package:app_bienestarmisena_v1/components/recuperar/recuperar_header.dart';
+import 'package:app_bienestarmisena_v1/controllers/recuperarContraseña/recuperar_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
+import 'package:app_bienestarmisena_v1/widgets/accesibilidad_bar.dart';
 
 class OlvidarContrasena extends StatefulWidget {
   const OlvidarContrasena({super.key});
@@ -10,294 +14,186 @@ class OlvidarContrasena extends StatefulWidget {
 }
 
 class _OlvidarContrasenaState extends State<OlvidarContrasena> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _codigoController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
-  final TextEditingController _confirmarPassController = TextEditingController();
+  final RecuperarController recuperarController = Get.put(RecuperarController());
 
-  bool _loading = false;
-  bool _mostrarCodigo = false;
-  bool _mostrarReset = false;
-  bool _mostrarPassword = false;
-  bool _mostrarConfirmarPassword = false;
-
-  final Color verde = const Color(0xFF39A900);
-
-  // 👉 Enviar correo con código
-  Future<void> _enviarCorreo() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      _showSnack("Por favor ingresa tu correo");
-      return;
-    }
-
-    setState(() => _loading = true);
-    try {
-      final res = await http.post(
-        Uri.parse("http://localhost:4000/api/v1/auths/forgotPassword"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email}),
-      );
-
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200) {
-        _showSnack("✅ Código enviado a tu correo");
-        setState(() => _mostrarCodigo = true);
-      } else {
-        _showSnack("⚠️ ${data["message"] ?? "No se pudo enviar el código"}");
-      }
-    } catch (e) {
-      _showSnack("❌ Error de conexión");
-    } finally {
-      setState(() => _loading = false);
-    }
-  }
-
-  // 👉 Verificar código
-  Future<void> _verificarCodigo() async {
-    if (_codigoController.text.length != 6) {
-      _showSnack("El código debe tener 6 dígitos");
-      return;
-    }
-
-    setState(() => _loading = true);
-    try {
-      final res = await http.post(
-        Uri.parse("http://localhost:4000/api/v1/auths/verifyCode"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "email": _emailController.text.trim(),
-          "code": _codigoController.text.trim()
-        }),
-      );
-
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200) {
-        _showSnack("✅ Código válido, ahora ingresa tu nueva contraseña");
-        setState(() {
-          _mostrarCodigo = false;
-          _mostrarReset = true;
-        });
-      } else {
-        _showSnack("⚠️ ${data["message"] ?? "Código inválido"}");
-      }
-    } catch (e) {
-      _showSnack("❌ Error al verificar código");
-    } finally {
-      setState(() => _loading = false);
-    }
-  }
-
-  // 👉 Resetear contraseña
-  Future<void> _resetPassword() async {
-    final pass = _passController.text.trim();
-    final confirm = _confirmarPassController.text.trim();
-
-    if (pass.length < 6) {
-      _showSnack("La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
-    if (pass != confirm) {
-      _showSnack("Las contraseñas no coinciden");
-      return;
-    }
-
-    setState(() => _loading = true);
-    try {
-      final res = await http.post(
-        Uri.parse("http://localhost:4000/api/v1/auths/resetPassword"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "email": _emailController.text.trim(),
-          "code": _codigoController.text.trim(),
-          "newPassword": pass
-        }),
-      );
-
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200) {
-        _showSnack("✅ Contraseña actualizada correctamente");
-        Navigator.pop(context); // Regresa al login
-      } else {
-        _showSnack("⚠️ ${data["message"] ?? "No se pudo actualizar"}");
-      }
-    } catch (e) {
-      _showSnack("❌ Error de conexión");
-    } finally {
-      setState(() => _loading = false);
-    }
-  }
-
-  void _showSnack(String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), duration: const Duration(seconds: 2)),
-    );
-  }
-
+  // ============================================================
+  // 🧩 INTERFAZ RESPONSIVE
+  // ============================================================
   @override
   Widget build(BuildContext context) {
+    final ancho = MediaQuery.of(context).size.width;
+    final alto = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF0FDF4),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            constraints: const BoxConstraints(maxWidth: 500),
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.grey.shade300),
-              boxShadow: [
-                BoxShadow(
-                  color: verde.withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+      body: Column(
+        children: [
+          // Barra de accesibilidad
+          const AccesibilidadBar(showScrollButtons: false),
+          
+          // Contenido principal
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? [
+                          const Color(0xFF1a1a2e),
+                          const Color(0xFF16213e),
+                          const Color(0xFF0f3460),
+                        ]
+                      : [
+                          Colors.blue.shade50,
+                          Colors.white,
+                          Colors.blue.shade100,
+                        ],
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset("img/convo2.png", height: 100),
-                const SizedBox(height: 20),
-                Text(
-                  "Recuperar Contraseña",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: verde,
+              ),
+              child: SafeArea(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ancho * 0.06,
+                      vertical: alto * 0.04,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 520),
+                      child: Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF1e1e2e)
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 40,
+                              offset: const Offset(0, 20),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // 🖼️ Header con logo y título
+                            const RecuperarHeader(),
+                            const SizedBox(height: 30),
+
+                            // Paso 1: Ingresar correo
+                            Obx(() {
+                              if (!recuperarController.mostrarCodigo.value && 
+                                  !recuperarController.mostrarReset.value) {
+                                return Column(
+                                  children: [
+                                    RecuperarFormField(
+                                      controller: recuperarController.emailController,
+                                      label: "Correo Electrónico",
+                                      prefixIcon: Icons.email_outlined,
+                                      keyboardType: TextInputType.emailAddress,
+                                    ),
+                                    const SizedBox(height: 20),
+                                    RecuperarButton(
+                                      onPressed: recuperarController.loading.value
+                                          ? null
+                                          : () => recuperarController.enviarCorreo(context),
+                                      isLoading: recuperarController.loading.value,
+                                      text: "Enviar Código",
+                                    ),
+                                  ],
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }),
+
+                            // Paso 2: Ingresar código
+                            Obx(() {
+                              if (recuperarController.mostrarCodigo.value) {
+                                return Column(
+                                  children: [
+                                    RecuperarFormField(
+                                      controller: recuperarController.codigoController,
+                                      label: "Código de Verificación",
+                                      prefixIcon: Icons.confirmation_number_outlined,
+                                      keyboardType: TextInputType.number,
+                                      maxLength: 6,
+                                    ),
+                                    const SizedBox(height: 20),
+                                    RecuperarButton(
+                                      onPressed: recuperarController.loading.value
+                                          ? null
+                                          : () => recuperarController.verificarCodigo(context),
+                                      isLoading: recuperarController.loading.value,
+                                      text: "Verificar Código",
+                                    ),
+                                  ],
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }),
+
+                            // Paso 3: Resetear contraseña
+                            Obx(() {
+                              if (recuperarController.mostrarReset.value) {
+                                return Column(
+                                  children: [
+                                    Obx(() => RecuperarFormField(
+                                      controller: recuperarController.passController,
+                                      label: "Nueva Contraseña",
+                                      prefixIcon: Icons.lock_outline,
+                                      obscureText: !recuperarController.mostrarPassword.value,
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          recuperarController.mostrarPassword.value
+                                              ? Icons.visibility_off
+                                              : Icons.visibility,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        onPressed: () =>
+                                            recuperarController.mostrarPassword.toggle(),
+                                      ),
+                                    )),
+                                    const SizedBox(height: 20),
+                                    Obx(() => RecuperarFormField(
+                                      controller: recuperarController.confirmarPassController,
+                                      label: "Confirmar Contraseña",
+                                      prefixIcon: Icons.lock_outline,
+                                      obscureText: !recuperarController.mostrarConfirmarPassword.value,
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          recuperarController.mostrarConfirmarPassword.value
+                                              ? Icons.visibility_off
+                                              : Icons.visibility,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        onPressed: () =>
+                                            recuperarController.mostrarConfirmarPassword.toggle(),
+                                      ),
+                                    )),
+                                    const SizedBox(height: 20),
+                                    RecuperarButton(
+                                      onPressed: recuperarController.loading.value
+                                          ? null
+                                          : () => recuperarController.resetPassword(context),
+                                      isLoading: recuperarController.loading.value,
+                                      text: "Guardar Nueva Contraseña",
+                                    ),
+                                  ],
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 30),
-
-                // Paso 1: Ingresar correo
-                if (!_mostrarCodigo && !_mostrarReset)
-                  Column(
-                    children: [
-                      TextField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: "Correo Electrónico",
-                          prefixIcon: const Icon(Icons.mail, color: Colors.grey),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: verde, width: 2),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      _botonAccion("Enviar Código", _enviarCorreo),
-                    ],
-                  ),
-
-                // Paso 2: Ingresar código
-                if (_mostrarCodigo)
-                  Column(
-                    children: [
-                      TextField(
-                        controller: _codigoController,
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        decoration: InputDecoration(
-                          labelText: "Código de Verificación",
-                          prefixIcon: const Icon(Icons.confirmation_number,
-                              color: Colors.grey),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      _botonAccion("Verificar Código", _verificarCodigo),
-                    ],
-                  ),
-
-                // Paso 3: Resetear contraseña
-                if (_mostrarReset)
-                  Column(
-                    children: [
-                      TextField(
-                        controller: _passController,
-                        obscureText: !_mostrarPassword,
-                        decoration: InputDecoration(
-                          labelText: "Nueva Contraseña",
-                          prefixIcon:
-                              const Icon(Icons.lock, color: Colors.grey),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _mostrarPassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () => setState(
-                                () => _mostrarPassword = !_mostrarPassword),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: _confirmarPassController,
-                        obscureText: !_mostrarConfirmarPassword,
-                        decoration: InputDecoration(
-                          labelText: "Confirmar Contraseña",
-                          prefixIcon:
-                              const Icon(Icons.lock, color: Colors.grey),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _mostrarConfirmarPassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () => setState(() =>
-                                _mostrarConfirmarPassword =
-                                    !_mostrarConfirmarPassword),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      _botonAccion("Guardar Nueva Contraseña", _resetPassword),
-                    ],
-                  ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _botonAccion(String texto, Function() accion) {
-    return SizedBox(
-      width: double.infinity,
-      height: 55,
-      child: ElevatedButton(
-        onPressed: _loading ? null : accion,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: verde,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: _loading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : Text(texto,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        ],
       ),
     );
   }

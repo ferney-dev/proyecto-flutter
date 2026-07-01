@@ -3,7 +3,7 @@ import 'package:app_bienestarmisena_v1/views/empresa/crearEmpresa.dart';
 import 'package:app_bienestarmisena_v1/views/empresa/editarEmpresa.dart';
 import 'package:flutter/material.dart';
 
-import 'package:app_bienestarmisena_v1/controllers/empresa_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/empresa/empresa_controller.dart';
 import 'package:app_bienestarmisena_v1/views/empresa/EditarEmpresa.dart' hide ModalEditarEmpresa;
 import 'package:app_bienestarmisena_v1/views/empresa/CrearEmpresa.dart' hide ModalCrearEmpresa;
 

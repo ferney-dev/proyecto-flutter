@@ -1,21 +1,22 @@
-import 'package:app_bienestarmisena_v1/controllers/favorites_controller.dart';
-import 'package:app_bienestarmisena_v1/controllers/userInterest.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get_instance/get_instance.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:collection/collection.dart';
-import 'package:get/get.dart';
-// 🧩 Widgets y controladores
-import 'package:app_bienestarmisena_v1/widgets/header.dart';
-import 'package:app_bienestarmisena_v1/views/detalleConvocatori/detalleConvocatoria.dart';
-import 'package:app_bienestarmisena_v1/controllers/lineas_controller.dart';
 
+import 'package:app_bienestarmisena_v1/controllers/favorites_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/usuario/user_interest_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/lineas/lineas_controller.dart';
+import 'package:app_bienestarmisena_v1/models/convocatorias/convocatoriasModel.dart';
 import 'package:app_bienestarmisena_v1/models/linea/linea_model.dart';
 import 'package:app_bienestarmisena_v1/models/userInterest/userInterest.dart';
+import 'package:app_bienestarmisena_v1/views/detalleConvocatori/detalleConvocatoria.dart';
+import 'package:app_bienestarmisena_v1/widgets/header.dart';
+import 'package:app_bienestarmisena_v1/widgets/accesibilidad_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
-// 🧩 Modelos
-import 'package:app_bienestarmisena_v1/models/convocatorias/convocatoriasModel.dart';
+import 'package:app_bienestarmisena_v1/components/favoritos/favoritos_filtros.dart';
+import 'package:app_bienestarmisena_v1/components/favoritos/favoritos_tarjeta.dart';
+import 'package:app_bienestarmisena_v1/components/favoritos/favoritos_lista.dart';
+import 'package:app_bienestarmisena_v1/components/favoritos/favoritos_paginador.dart';
 
 class FavoritosPage extends StatefulWidget {
   final int userId;
@@ -167,13 +168,21 @@ class _FavoritosPageState extends State<FavoritosPage> {
     }
   }
 
+  // 🔹 Modal de detalle
+  void mostrarModalConvocatoria(Convocatoria c) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ModalConvocatoria(
+          convocatoria: c,
+          cerrarModal: () => Navigator.of(context).pop(),
+        );
+      },
+    );
+  }
+
  @override
 Widget build(BuildContext context) {
-  final inicio = (paginaActual - 1) * itemsPorPagina;
-  final fin = (inicio + itemsPorPagina > convocatorias.length)
-      ? convocatorias.length
-      : inicio + itemsPorPagina;
-
   // 🔹 1️⃣ Aplica filtros dinámicos
   final filtradas = convocatorias.where((conv) {
     // Línea seleccionada
@@ -236,8 +245,12 @@ Widget build(BuildContext context) {
 
     return Scaffold(
   backgroundColor: Colors.white,
-  body: SafeArea(
-    child: cargando
+  body: Column(
+    children: [
+      const AccesibilidadBar(showScrollButtons: false),
+      Expanded(
+        child: SafeArea(
+          child: cargando
         ? const Center(child: CircularProgressIndicator())
         : SingleChildScrollView(
             child: Center(
@@ -256,7 +269,7 @@ Widget build(BuildContext context) {
                   border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -276,108 +289,26 @@ Widget build(BuildContext context) {
                     // ===========================================
                     // 🔸 Contenedor de filtros
                     // ===========================================
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 22, vertical: 22),
-                      margin: const EdgeInsets.only(bottom: 24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                            color: Colors.grey.shade300, width: 1.4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Wrap(
-                        spacing: 20,
-                        runSpacing: 18,
-                        alignment: WrapAlignment.spaceBetween,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          // 🔸 Línea
-                          _buildFilterField(
-                            icon: Icons.category_outlined,
-                            label: "Línea",
-                            value: categoriaSeleccionada,
-                            items: [
-                              'Todas las categorías',
-                              ..._lineas.map((l) => l.name).toList(),
-                            ],
-                            onChanged: (v) {
-                              setState(() => categoriaSeleccionada = v!);
-                            },
-                            width: 420, // 📏 Más anchos
-                          ),
-
-                          // 🔸 Interés Usuario
-                          _buildFilterField(
-                            icon: Icons.interests_outlined,
-                            label: "Interés Usuario",
-                            value: interesSeleccionado,
-                            items: _interesesUsuario.isNotEmpty
-                                ? [
-                                    'Sin intereses asociados',
-                                    ..._interesesUsuario
-                                        .map((i) => i.interestName)
-                                        .toList(),
-                                  ]
-                                : ['Sin intereses asociados'],
-                            onChanged: (v) {
-                              setState(() => interesSeleccionado = v!);
-                            },
-                            width: 420,
-                          ),
-
-                          // 🔸 Ordenar por
-                          _buildFilterField(
-                            icon: Icons.sort_rounded,
-                            label: "Ordenar por",
-                            value: ordenarPor,
-                            items: ordenes,
-                            onChanged: (v) =>
-                                setState(() => ordenarPor = v!),
-                            width: 420,
-                          ),
-
-                          // 🔸 Vista (Tarjeta / Lista)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(40),
-                              border: Border.all(
-                                  color: Colors.grey.shade300, width: 1.2),
-                            ),
-                            child: ToggleButtons(
-                              borderRadius: BorderRadius.circular(30),
-                              selectedColor: Colors.white,
-                              fillColor: const Color(0xFF00A884),
-                              color: Colors.grey.shade600,
-                              constraints: const BoxConstraints(
-                                  minWidth: 58, minHeight: 46),
-                              isSelected: [
-                                vista == "Tarjeta",
-                                vista == "Lista"
-                              ],
-                              onPressed: (index) {
-                                setState(() {
-                                  vista = index == 0 ? "Tarjeta" : "Lista";
-                                });
-                              },
-                              children: const [
-                                Icon(Icons.grid_view_rounded, size: 24),
-                                Icon(Icons.view_list_rounded, size: 24),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    FavoritosFiltros(
+                      lineas: _lineas,
+                      interesesUsuario: _interesesUsuario,
+                      categoriaSeleccionada: categoriaSeleccionada,
+                      interesSeleccionado: interesSeleccionado,
+                      ordenarPor: ordenarPor,
+                      vista: vista,
+                      ordenes: ordenes,
+                      onCategoriaChanged: (val) {
+                        setState(() => categoriaSeleccionada = val);
+                      },
+                      onInteresChanged: (val) {
+                        setState(() => interesSeleccionado = val);
+                      },
+                      onOrdenarChanged: (val) {
+                        setState(() => ordenarPor = val);
+                      },
+                      onVistaChanged: (val) {
+                        setState(() => vista = val);
+                      },
                     ),
 
                     // ===========================================
@@ -399,612 +330,40 @@ Widget build(BuildContext context) {
                           ),
                         ),
                       )
-                    else if (vista == "Tarjeta") ...[
-                      // 🔸 Vista tipo Tarjeta (grid)
-                      GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: paginaFiltrada.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          childAspectRatio: 0.88, // 📏 más equilibrado
-                          crossAxisSpacing: 22,
-                          mainAxisSpacing: 22,
-                        ),
-                        itemBuilder: (context, index) {
-                          final conv = paginaFiltrada[index];
-                          return _buildCard(context, conv);
-                        },
+                    else if (vista == "Tarjeta")
+                      FavoritosTarjeta(
+                        items: paginaFiltrada,
+                        onDetalles: mostrarModalConvocatoria,
+                        onEliminar: _eliminarFavorito,
+                      )
+                    else
+                      FavoritosLista(
+                        items: paginaFiltrada,
+                        onDetalles: mostrarModalConvocatoria,
+                        onEliminar: _eliminarFavorito,
                       ),
-                    ] else ...[
-                      // 🔸 Vista tipo Lista (cards horizontales)
-                      Column(
-                        children: paginaFiltrada
-                            .map((conv) => _buildListCard(context, conv))
-                            .toList(),
-                      ),
-                    ],
 
                     const SizedBox(height: 26),
 
                     // ===========================================
                     // 🔹 Paginador
                     // ===========================================
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          onPressed: paginaActual > 1
-                              ? () => setState(() => paginaActual--)
-                              : null,
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                        ),
-                        Text(
-                          "Página $paginaActual de $totalPaginas (${convocatorias.length} favoritos)",
-                          style: const TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w500),
-                        ),
-                        IconButton(
-                          onPressed: paginaActual < totalPaginas
-                              ? () => setState(() => paginaActual++)
-                              : null,
-                          icon: const Icon(Icons.arrow_forward_ios_rounded),
-                        ),
-                      ],
+                    FavoritosPaginador(
+                      currentPage: paginaActual,
+                      totalPages: totalPaginas,
+                      totalItems: convocatorias.length,
+                      onPrevious: () => setState(() => paginaActual--),
+                      onNext: () => setState(() => paginaActual++),
                     ),
                   ],
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    ],
   ),
 );
-
-  }
-
-// ===============================
-// 🔹 Campo de filtro reutilizable
-// ===============================
-Widget _buildFilterField({
-  required IconData icon,
-  required String label,
-  required String value,
-  required List<String> items,
-  required Function(String?) onChanged,
-  double width = 250, // ✅ parámetro opcional con valor por defecto
-}) {
-  return SizedBox(
-    width: width, // 📏 ahora funciona correctamente
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 🔹 Etiqueta superior con ícono
-        Row(
-          children: [
-            Icon(icon, color: const Color(0xFF00324D), size: 18),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14.5,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF00324D),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-
-        // 🔹 Dropdown estilizado
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300, width: 1.3),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: value,
-              icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                  color: Colors.grey),
-              items: items
-                  .map((String item) => DropdownMenuItem<String>(
-                        value: item,
-                        child: Text(
-                          item,
-                          style: const TextStyle(fontSize: 14.5),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ))
-                  .toList(),
-              onChanged: onChanged,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
 }
-
-
-  // ✅ Tarjeta estilo moderno (similar al diseño React)
-  Widget _buildCard(BuildContext context, Convocatoria conv) {
-    bool isExpanded = false;
-
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-            border: Border.all(color: Colors.grey.shade200, width: 1),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 🖼 Imagen superior con efecto hover
-                    GestureDetector(
-                      onTap: () => mostrarModalConvocatoria(context, conv),
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          height: 220,
-                          width: double.infinity,
-                          clipBehavior: Clip.antiAlias,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(16)),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                (conv.imageUrl != null &&
-                                        conv.imageUrl!.isNotEmpty)
-                                    ? conv.imageUrl!
-                                    : "https://via.placeholder.com/400x200",
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // 📄 Contenido textual
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 🔹 Título
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Icon(Icons.campaign,
-                                  color: Color(0xFF00324D), size: 18),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  conv.title,
-                                  style: const TextStyle(
-                                    color: Color(0xFF00324D),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    height: 1.3,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 6),
-
-                          // 🔹 Descripción expandible
-                          GestureDetector(
-                            onTap: () =>
-                                setState(() => isExpanded = !isExpanded),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(Icons.description_outlined,
-                                    color: Color(0xFF00324D), size: 18),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    conv.description.isNotEmpty
-                                        ? conv.description
-                                        : "Sin descripción disponible.",
-                                    maxLines: isExpanded ? null : 3,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade700,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          // 🔹 Fechas apertura y cierre
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.calendar_today,
-                                        size: 16, color: Color(0xFF00324D)),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      "Apertura: ${conv.openDate.split('T')[0]}",
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.calendar_month,
-                                        size: 16, color: Colors.redAccent),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      "Cierre: ${conv.closeDate.split('T')[0]}",
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // 🔹 Botones inferiores
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: () =>
-                                      mostrarModalConvocatoria(context, conv),
-                                  icon: const Icon(Icons.insert_drive_file,
-                                      size: 18),
-                                  label: const Text("Detalles"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF00324D),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: () {},
-                                  icon:
-                                      const Icon(Icons.check_circle, size: 18),
-                                  label: const Text("Inscribirse"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF39A900),
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                // 🔹 Botón eliminar favorito (arriba a la derecha)
-                // 🔹 Botón eliminar favorito (arriba a la derecha)
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: GestureDetector(
-                    onTap: () => _eliminarFavorito(conv), // ✅ AQUÍ
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.delete_forever_rounded,
-                        color: Colors.red,
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  /// ✅ Vista tipo lista con diseño moderno (basado en el diseño React)
-  Widget _buildListCard(BuildContext context, Convocatoria conv) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.shade200, width: 1),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 🖼 Imagen izquierda con efecto hover (en web)
-                Expanded(
-                  flex: 2,
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () => mostrarModalConvocatoria(context, conv),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        height: 200,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              (conv.imageUrl != null &&
-                                      conv.imageUrl!.isNotEmpty)
-                                  ? conv.imageUrl!
-                                  : "https://via.placeholder.com/400x200",
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // 📄 Contenido derecho
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 🔹 Título con ícono
-                        Row(
-                          children: [
-                            const Icon(Icons.campaign,
-                                color: Color(0xFF00324D), size: 18),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                conv.title,
-                                style: const TextStyle(
-                                  color: Color(0xFF00324D),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 10),
-                        Divider(color: Colors.grey.shade300, thickness: 1),
-
-                        // 🔹 Descripción
-                        const SizedBox(height: 10),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.school_outlined,
-                                color: Color(0xFF00324D), size: 18),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                conv.description.isNotEmpty
-                                    ? (conv.description.length > 200
-                                        ? "${conv.description.substring(0, 200)}..."
-                                        : conv.description)
-                                    : "Sin descripción disponible.",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey.shade700,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 14),
-
-                        // 🔹 Fechas apertura / cierre
-                        Wrap(
-                          spacing: 20,
-                          runSpacing: 8,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.calendar_today,
-                                    size: 16, color: Color(0xFF00324D)),
-                                const SizedBox(width: 6),
-                                Text(
-                                  "Apertura: ${conv.openDate.split('T')[0]}",
-                                  style: const TextStyle(fontSize: 13.5),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.calendar_month,
-                                    size: 16, color: Colors.redAccent),
-                                const SizedBox(width: 6),
-                                Text(
-                                  "Cierre: ${conv.closeDate.split('T')[0]}",
-                                  style: const TextStyle(fontSize: 13.5),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 18),
-                        Divider(color: Colors.grey.shade300, thickness: 1),
-
-                        // 🔹 Botones
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: () =>
-                                  mostrarModalConvocatoria(context, conv),
-                              icon:
-                                  const Icon(Icons.insert_drive_file, size: 18),
-                              label: const Text("Detalles"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF00324D),
-                                foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            ElevatedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(Icons.check_circle, size: 18),
-                              label: const Text("Inscribirse"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF39A900),
-                                foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                            const Spacer(),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            // 🔹 Botón eliminar favorito
-            // 🔹 Botón eliminar favorito
-            Positioned(
-              top: 10,
-              right: 10,
-              child: GestureDetector(
-                onTap: () => _eliminarFavorito(conv), // ✅ Acción real
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.delete_forever_rounded,
-                    color: Colors.red,
-                    size: 22,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // 🔹 Modal de detalle
-  void mostrarModalConvocatoria(BuildContext context, Convocatoria c) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ModalConvocatoria(
-          convocatoria: c,
-          cerrarModal: () => Navigator.of(context).pop(),
-        );
-      },
-    );
-  }
 }

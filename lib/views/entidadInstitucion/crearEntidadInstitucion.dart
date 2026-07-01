@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/entidadInstitucion_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/entidad/entidad_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 

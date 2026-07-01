@@ -1,5 +1,5 @@
-import 'package:app_bienestarmisena_v1/controllers/cuidadController.dart';
-import 'package:app_bienestarmisena_v1/controllers/departamentoController.dart';
+import 'package:app_bienestarmisena_v1/controllers/ciudad/ciudad_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/departamento/departamento_controller.dart';
 import 'package:app_bienestarmisena_v1/models/cuidad/cuidad.dart' hide Department;
 import 'package:app_bienestarmisena_v1/models/departamento/departamento.dart';
 

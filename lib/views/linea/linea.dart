@@ -1,7 +1,7 @@
 import 'package:app_bienestarmisena_v1/views/linea/EditarLinea.dart';
 import 'package:app_bienestarmisena_v1/views/linea/crearLinea.dart';
 import 'package:flutter/material.dart';
-import 'package:app_bienestarmisena_v1/controllers/lineas_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/lineas/lineas_controller.dart';
 import 'package:app_bienestarmisena_v1/models/linea/linea_model.dart';
 
 class ViewLinea extends StatefulWidget {

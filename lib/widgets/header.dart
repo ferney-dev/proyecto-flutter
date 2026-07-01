@@ -11,6 +11,11 @@ import 'package:app_bienestarmisena_v1/views/perfilUser/perfil.dart';
 // ✅ Nueva importación para el menú de administrador
 import 'package:app_bienestarmisena_v1/views/adminmenu/adminmenu.dart';
 
+// ✅ Componentes del header
+import 'package:app_bienestarmisena_v1/components/header/header_search_bar.dart';
+import 'package:app_bienestarmisena_v1/components/header/header_nav_item.dart';
+import 'package:app_bienestarmisena_v1/components/header/header_user_avatar.dart';
+
 class Header extends StatelessWidget {
   final String selected; // 🔹 Opción seleccionada en el menú
 
@@ -24,160 +29,209 @@ class Header extends StatelessWidget {
     // ✅ Obtiene el controlador global del usuario logueado
     final Reactcontroller reactController = Get.find<Reactcontroller>();
 
-    final String userName = reactController.userName.value;
-    final int userId = reactController.userId.value;
-    final int roleId = reactController.roleId.value; // 👈 Asegúrate de que tu Reactcontroller tenga esto
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
 
-    // ✅ Muestra la primera letra del nombre o "?" si está vacío
-    final String firstLetter =
-        userName.isNotEmpty ? userName[0].toUpperCase() : "?";
+    return Obx(() {
+      final String userName = reactController.userName.value;
+      final int userId = reactController.userId.value;
+      final int roleId = reactController.roleId.value; // 👈 Asegúrate de que tu Reactcontroller tenga esto
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 🔹 Logos superiores
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Image.asset("img/sena.png", width: 100, height: 100),
-              Image.asset("img/convo2.png", width: 120, height: 120),
-            ],
-          ),
+      // Debug para verificar el roleId
+      debugPrint("🔍 Header - roleId: $roleId, userName: $userName");
 
-          const SizedBox(height: 12),
+      // ✅ Muestra la primera letra del nombre o "?" si está vacío
+      final String firstLetter =
+          userName.isNotEmpty ? userName[0].toUpperCase() : "?";
 
-          // 🔹 Menú superior con buscador y navegación
-          Row(
-            children: [
-              // 🔍 Barra de búsqueda
-              SizedBox(
-                width: 340,
-                height: 40,
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Buscar...",
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide(color: Colors.grey.shade400),
-                    ),
-                  ),
-                ),
+      // 🔹 Función para navegar (definida dentro del Obx)
+      void navigateTo(Widget page) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => page),
+        );
+      }
+
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 🔹 Logos superiores
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Image.asset("assets/img/sena.png", width: isMobile ? 60 : 100, height: isMobile ? 60 : 100),
+                Image.asset("assets/img/convo2.png", width: isMobile ? 80 : 120, height: isMobile ? 80 : 120),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // 🔹 Menú superior con buscador y navegación
+            isMobile ? _buildMobileMenu(context, roleId, userName, firstLetter, selected, navigateTo) : _buildDesktopMenu(context, roleId, userName, firstLetter, selected, navigateTo),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildDesktopMenu(BuildContext context, int roleId, String userName, String firstLetter, String selected, Function(Widget) navigateTo) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // 🔍 Barra de búsqueda
+        const HeaderSearchBar(isMobile: false),
+        const SizedBox(height: 16),
+
+        // 🔹 Opciones de navegación
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            HeaderNavItem(
+              icon: Icons.local_offer,
+              label: "Descubrir",
+              isSelected: selected == "Descubrir",
+              onTap: () => navigateTo(const Inicio()),
+            ),
+            const SizedBox(width: 30),
+
+            HeaderNavItem(
+              icon: Icons.explore,
+              label: "Explorar",
+              isSelected: selected == "Explorar",
+              onTap: () => navigateTo(const ExplorarPage()),
+            ),
+            const SizedBox(width: 30),
+
+            HeaderNavItem(
+              icon: Icons.bookmark_border,
+              label: "Favoritos",
+              isSelected: selected == "Favoritos",
+              onTap: () => navigateTo(FavoritosPage(userId: Get.find<Reactcontroller>().userId.value)),
+            ),
+            const SizedBox(width: 30),
+
+            // ✅ Solo visible si el rol del usuario es administrador (roleId 1, 2, o 3)
+            if (roleId == 1 || roleId == 2 || roleId == 3) ...[
+              HeaderNavItem(
+                icon: Icons.admin_panel_settings,
+                label: "administrador",
+                isSelected: selected == "administrador",
+                onTap: () => navigateTo(const AdminPanel()),
               ),
-              const Spacer(),
-
-              // 🔹 Opciones de navegación
-              Row(
-                children: [
-                  _navItem(
-                    context,
-                    Icons.local_offer,
-                    "Descubrir",
-                    selected == "Descubrir",
-                    const Inicio(),
-                  ),
-                  const SizedBox(width: 16),
-
-                  _navItem(
-                    context,
-                    Icons.explore,
-                    "Explorar",
-                    selected == "Explorar",
-                    const ExplorarPage(),
-                  ),
-                  const SizedBox(width: 16),
-
-                  _navItem(
-                    context,
-                    Icons.bookmark_border,
-                    "Favoritos",
-                    selected == "Favoritos",
-                    FavoritosPage(userId: userId),
-                  ),
-                  const SizedBox(width: 16),
-
-                  // ✅ Solo visible si el rol del usuario es 2 (Administrador)
-                  if (roleId == 2) ...[
-                    _navItem(
-                      context,
-                      Icons.admin_panel_settings, // 🛡️ Ícono de admin
-                      "Admin",
-                      selected == "Admin",
-                      const AdminPanel(),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-
-                  // 🔹 Avatar del usuario que lleva al perfil
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PerfilUsuarioPage(),
-                        ),
-                      );
-                    },
-                    child: CircleAvatar(
-                      radius: 22,
-                      backgroundColor: Colors.grey.shade700,
-                      child: Text(
-                        firstLetter,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(width: 30),
             ],
-          ),
-        ],
-      ),
+
+            // 🔹 Avatar del usuario
+            HeaderUserAvatar(
+              firstLetter: firstLetter,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PerfilUsuarioPage()),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-  // 🔹 Función para crear los botones del menú
-  Widget _navItem(
-    BuildContext context,
-    IconData icon,
-    String label,
-    bool isSelected,
-    Widget page,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        if (!isSelected) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
-        }
-      },
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 24,
-            color: isSelected ? const Color(0xFF39A900) : Colors.black,
+  Widget _buildMobileMenu(BuildContext context, int roleId, String userName, String firstLetter, String selected, Function(Widget) navigateTo) {
+    return Column(
+      children: [
+        // 🔍 Barra de búsqueda en móvil
+        const HeaderSearchBar(isMobile: true),
+        const SizedBox(height: 12),
+        // 🔹 Opciones de navegación en móvil
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            children: [
+              _buildMobileNavItem(
+                icon: Icons.local_offer,
+                label: "Descubrir",
+                isSelected: selected == "Descubrir",
+                onTap: () => navigateTo(const Inicio()),
+              ),
+              const SizedBox(width: 8),
+
+              _buildMobileNavItem(
+                icon: Icons.explore,
+                label: "Explorar",
+                isSelected: selected == "Explorar",
+                onTap: () => navigateTo(const ExplorarPage()),
+              ),
+              const SizedBox(width: 8),
+
+              _buildMobileNavItem(
+                icon: Icons.bookmark_border,
+                label: "Favoritos",
+                isSelected: selected == "Favoritos",
+                onTap: () => navigateTo(FavoritosPage(userId: Get.find<Reactcontroller>().userId.value)),
+              ),
+              const SizedBox(width: 8),
+
+              // ✅ Solo visible si el rol del usuario es administrador (roleId 1, 2, o 3)
+              if (roleId == 1 || roleId == 2 || roleId == 3) ...[
+                _buildMobileNavItem(
+                  icon: Icons.admin_panel_settings,
+                  label: "Admin",
+                  isSelected: selected == "Admin",
+                  onTap: () => navigateTo(const AdminPanel()),
+                ),
+                const SizedBox(width: 8),
+              ],
+
+              // 🔹 Avatar del usuario
+              HeaderUserAvatar(
+                firstLetter: firstLetter,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PerfilUsuarioPage()),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 15,
-              color: isSelected ? const Color(0xFF39A900) : Colors.black,
-              fontWeight: FontWeight.bold,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileNavItem({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.shade100 : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.blue.shade600 : Colors.grey.shade600,
             ),
-          ),
-        ],
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? Colors.blue.shade600 : Colors.grey.shade700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

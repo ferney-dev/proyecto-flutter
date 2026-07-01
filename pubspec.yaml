@@ -19,6 +19,8 @@ dependencies:
   awesome_dialog: ^3.2.0              # Diálogos elegantes estilo SweetAlert2
   url_launcher: ^6.3.0                # Abrir enlaces externos
   carousel_slider: ^5.1.1             # Carrusel de imágenes
+  shared_preferences: ^2.2.3          # Persistencia de datos locales
+  flutter_dotenv: ^5.1.0             # Variables de entorno (.env)
 
 dev_dependencies:
   flutter_test:
@@ -36,3 +38,4 @@ flutter:
     - assets/img/ejeq.png
     - assets/img/maxresdefault.jpg
     - assets/img/sena.png
+    - .env

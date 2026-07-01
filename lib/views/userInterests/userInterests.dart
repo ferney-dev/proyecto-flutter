@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/userInterest.dart';
+import 'package:app_bienestarmisena_v1/controllers/usuario/user_interest_controller.dart';
 import 'package:app_bienestarmisena_v1/models/userInterest/userInterest.dart';
 import 'package:flutter/material.dart';
 import 'package:app_bienestarmisena_v1/views/userInterests/crearUserInterest.dart';

@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/interesController.dart';
+import 'package:app_bienestarmisena_v1/controllers/interes/interes_controller.dart';
 import 'package:flutter/material.dart';
 
 class ModalCrearInteres extends StatefulWidget {

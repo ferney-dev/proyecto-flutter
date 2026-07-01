@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app_bienestarmisena_v1/controllers/lineas_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/lineas/lineas_controller.dart';
 
 class ModalCrearLinea extends StatefulWidget {
   final VoidCallback onSuccess;

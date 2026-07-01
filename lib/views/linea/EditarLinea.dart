@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app_bienestarmisena_v1/controllers/lineas_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/lineas/lineas_controller.dart';
 import 'package:app_bienestarmisena_v1/models/linea/linea_model.dart';
 
 class ModalEditarLinea extends StatefulWidget {

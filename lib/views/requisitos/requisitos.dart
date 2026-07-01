@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:app_bienestarmisena_v1/widgets/accesibilidad_bar.dart';
 
 class RequisitosPage extends StatefulWidget {
   final int companyId; // 🔹 ID de la empresa logueada
@@ -197,328 +198,335 @@ class _RequisitosPageState extends State<RequisitosPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F4F6),
-      body: SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: maxAncho),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ============================
-                // 🔹 ENCABEZADO AZUL
-                // ============================
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF00324D), Color(0xFF005B8C)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(14),
-                      topRight: Radius.circular(14),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: const [
-                          Icon(FontAwesomeIcons.fileAlt,
-                              color: Colors.white, size: 28),
-                          SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Gestión de Requisitos",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white)),
-                              Text(
-                                "Cada usuario o empresa puede marcar sus propios requisitos",
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 12),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
-                                width: 60,
-                                height: 60,
-                                child: CircularProgressIndicator(
-                                  value: total > 0 ? completados / total : 0,
-                                  strokeWidth: 6,
-                                  valueColor:
-                                      const AlwaysStoppedAnimation<Color>(
-                                          Colors.white),
-                                  backgroundColor: Colors.white24,
-                                ),
-                              ),
-                              Text(
-                                "$progreso%",
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14),
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 5),
-                          const Text("Completado",
-                              style:
-                                  TextStyle(color: Colors.white70, fontSize: 12))
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-
-                // ============================
-                // 🔹 TABS CATEGORÍAS
-                // ============================
-                if (categorias.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "⚠️ No hay categorías registradas.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  )
-                else
-                  Container(
-                    color: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                    child: Row(
-                      children: categorias.map((cat) {
-                        final isActive = cat["id"] == categoriaActiva;
-                        return Expanded(
-                          child: GestureDetector(
-                            onTap: () => setState(() {
-                              categoriaActiva = cat["id"];
-                            }),
-                            child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 6),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 12),
-                              decoration: BoxDecoration(
-                                color: isActive
-                                    ? const Color(0xFF00324D)
-                                    : Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Center(
-                                child: Text(cat["name"],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: isActive
-                                          ? Colors.white
-                                          : Colors.black87,
-                                    )),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-
-                // ============================
-                // 🔹 CONTENEDOR PRINCIPAL
-                // ============================
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(14),
-                      bottomRight: Radius.circular(14),
-                    ),
-                  ),
+      body: Column(
+        children: [
+          const AccesibilidadBar(showScrollButtons: false),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxAncho),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // 🔹 BUSCADOR + FILTROS
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.search,
-                                    color: Colors.grey),
-                                hintText: "Buscar requisitos...",
-                                filled: true,
-                                fillColor: Colors.white,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                      BorderSide(color: Colors.grey.shade300),
-                                ),
-                              ),
-                              onChanged: (val) =>
-                                  setState(() => busqueda = val),
-                            ),
+                      // ============================
+                      // 🔹 ENCABEZADO AZUL
+                      // ============================
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF00324D), Color(0xFF005B8C)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          const SizedBox(width: 10),
-                          ElevatedButton.icon(
-                            onPressed: () =>
-                                setState(() => mostrarFiltros = !mostrarFiltros),
-                            icon: const Icon(Icons.filter_list,
-                                size: 18, color: Colors.white),
-                            label: const Text("Filtros",
-                                style: TextStyle(color: Colors.white)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF00324D),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30)),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 20),
-                            ),
-                          )
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      if (mostrarFiltros)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _botonFiltro("Todos"),
-                            const SizedBox(width: 8),
-                            _botonFiltro("Completados"),
-                            const SizedBox(width: 8),
-                            _botonFiltro("Pendientes"),
-                          ],
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(14),
+                            topRight: Radius.circular(14),
+                          ),
                         ),
-
-                      const SizedBox(height: 16),
-
-                      // 🔹 ACORDEONES DE REQUISITOS
-                      if (grupos.isEmpty)
-                        const Text("No hay grupos ni requisitos disponibles.",
-                            style: TextStyle(color: Colors.grey))
-                      else
-                        ...grupos
-                            .where((g) => g["categoryId"] == categoriaActiva)
-                            .map((grupo) {
-                          final items = requisitosCategoria
-                              .where((r) => r["groupId"] == grupo["id"])
-                              .toList();
-                          final abierto =
-                              acordeonesAbiertos[grupo["id"]] ?? false;
-
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border:
-                                  Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Column(
-                              children: [
-                                ListTile(
-                                  title: Text(grupo["name"],
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF00324D))),
-                                  trailing: Icon(
-                                    abierto
-                                        ? Icons.keyboard_arrow_up
-                                        : Icons.keyboard_arrow_down,
-                                    color: Colors.black54,
-                                  ),
-                                  onTap: () => setState(() =>
-                                      acordeonesAbiertos[grupo["id"]] =
-                                          !abierto),
-                                ),
-                                if (abierto)
-                                  Column(
-                                    children: items.map((item) {
-                                      return ListTile(
-                                        leading: Checkbox(
-                                          value: item["completo"],
-                                          onChanged: (val) => setState(() {
-                                            item["completo"] = val ?? false;
-                                          }),
-                                        ),
-                                        title: Text(
-                                          item["name"],
-                                          style: TextStyle(
-                                            decoration: item["completo"]
-                                                ? TextDecoration.lineThrough
-                                                : null,
-                                            color: item["completo"]
-                                                ? Colors.grey
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  )
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(FontAwesomeIcons.fileAlt,
+                                    color: Colors.white, size: 28),
+                                SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Gestión de Requisitos",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                    Text(
+                                      "Cada usuario o empresa puede marcar sus propios requisitos",
+                                      style: TextStyle(
+                                          color: Colors.white70, fontSize: 12),
+                                    ),
+                                  ],
+                                )
                               ],
                             ),
-                          );
-                        }).toList(),
-
-                      const SizedBox(height: 30),
-
-                      // 🔹 BOTONES FINALES
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          OutlinedButton.icon(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.close, color: Colors.white),
-                            label: const Text("Cancelar",
-                                style: TextStyle(color: Colors.white)),
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 92, 77, 77),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 24),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30)),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          ElevatedButton.icon(
-                            onPressed: _guardarCambios,
-                            icon: const Icon(Icons.check, color: Colors.white),
-                            label: const Text("Guardar Cambios",
-                                style: TextStyle(color: Colors.white)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF00324D),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 24),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30)),
-                            ),
-                          ),
-                        ],
+                            Column(
+                              children: [
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 60,
+                                      height: 60,
+                                      child: CircularProgressIndicator(
+                                        value: total > 0 ? completados / total : 0,
+                                        strokeWidth: 6,
+                                        valueColor:
+                                            const AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                        backgroundColor: Colors.white24,
+                                      ),
+                                    ),
+                                    Text(
+                                      "$progreso%",
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                const Text("Completado",
+                                    style:
+                                        TextStyle(color: Colors.white70, fontSize: 12))
+                              ],
+                            )
+                          ],
+                        ),
                       ),
+
+                      // ============================
+                      // 🔹 TABS CATEGORÍAS
+                      // ============================
+                      if (categorias.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            "⚠️ No hay categorías registradas.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        )
+                      else
+                        Container(
+                          color: Colors.white,
+                          padding:
+                              const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                          child: Row(
+                            children: categorias.map((cat) {
+                              final isActive = cat["id"] == categoriaActiva;
+                              return Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() {
+                                    categoriaActiva = cat["id"];
+                                  }),
+                                  child: Container(
+                                    margin:
+                                        const EdgeInsets.symmetric(horizontal: 6),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: isActive
+                                          ? const Color(0xFF00324D)
+                                          : Colors.grey.shade300,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Center(
+                                      child: Text(cat["name"],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: isActive
+                                                ? Colors.white
+                                                : Colors.black87,
+                                          )),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+
+                      // ============================
+                      // 🔹 CONTENEDOR PRINCIPAL
+                      // ============================
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(24),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(14),
+                            bottomRight: Radius.circular(14),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            // 🔹 BUSCADOR + FILTROS
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      prefixIcon: const Icon(Icons.search,
+                                          color: Colors.grey),
+                                      hintText: "Buscar requisitos...",
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(horizontal: 16),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide:
+                                            BorderSide(color: Colors.grey.shade300),
+                                      ),
+                                    ),
+                                    onChanged: (val) =>
+                                        setState(() => busqueda = val),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                ElevatedButton.icon(
+                                  onPressed: () =>
+                                      setState(() => mostrarFiltros = !mostrarFiltros),
+                                  icon: const Icon(Icons.filter_list,
+                                      size: 18, color: Colors.white),
+                                  label: const Text("Filtros",
+                                      style: TextStyle(color: Colors.white)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF00324D),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30)),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12, horizontal: 20),
+                                  ),
+                                )
+                              ],
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            if (mostrarFiltros)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _botonFiltro("Todos"),
+                                  const SizedBox(width: 8),
+                                  _botonFiltro("Completados"),
+                                  const SizedBox(width: 8),
+                                  _botonFiltro("Pendientes"),
+                                ],
+                              ),
+
+                            const SizedBox(height: 16),
+
+                            // 🔹 ACORDEONES DE REQUISITOS
+                            if (grupos.isEmpty)
+                              const Text("No hay grupos ni requisitos disponibles.",
+                                  style: TextStyle(color: Colors.grey))
+                            else
+                              ...grupos
+                                  .where((g) => g["categoryId"] == categoriaActiva)
+                                  .map((grupo) {
+                                final items = requisitosCategoria
+                                    .where((r) => r["groupId"] == grupo["id"])
+                                    .toList();
+                                final abierto =
+                                    acordeonesAbiertos[grupo["id"]] ?? false;
+
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text(grupo["name"],
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFF00324D))),
+                                        trailing: Icon(
+                                          abierto
+                                              ? Icons.keyboard_arrow_up
+                                              : Icons.keyboard_arrow_down,
+                                          color: Colors.black54,
+                                        ),
+                                        onTap: () => setState(() =>
+                                            acordeonesAbiertos[grupo["id"]] =
+                                                !abierto),
+                                      ),
+                                      if (abierto)
+                                        Column(
+                                          children: items.map((item) {
+                                            return ListTile(
+                                              leading: Checkbox(
+                                                value: item["completo"],
+                                                onChanged: (val) => setState(() {
+                                                  item["completo"] = val ?? false;
+                                                }),
+                                              ),
+                                              title: Text(
+                                                item["name"],
+                                                style: TextStyle(
+                                                  decoration: item["completo"]
+                                                      ? TextDecoration.lineThrough
+                                                      : null,
+                                                  color: item["completo"]
+                                                      ? Colors.grey
+                                                      : Colors.black,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        )
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+
+                            const SizedBox(height: 30),
+
+                            // 🔹 BOTONES FINALES
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: () => Navigator.pop(context),
+                                  icon: const Icon(Icons.close, color: Colors.white),
+                                  label: const Text("Cancelar",
+                                      style: TextStyle(color: Colors.white)),
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 92, 77, 77),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12, horizontal: 24),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30)),
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                ElevatedButton.icon(
+                                  onPressed: _guardarCambios,
+                                  icon: const Icon(Icons.check, color: Colors.white),
+                                  label: const Text("Guardar Cambios",
+                                      style: TextStyle(color: Colors.white)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF00324D),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12, horizontal: 24),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 40),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

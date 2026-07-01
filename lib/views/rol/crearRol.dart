@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/rol_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/rol/rol_controller.dart';
 import 'package:flutter/material.dart';
 
 class ModalCrearRol extends StatefulWidget {

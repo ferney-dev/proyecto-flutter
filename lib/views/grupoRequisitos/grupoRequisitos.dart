@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/requirementGruposController.dart';
+import 'package:app_bienestarmisena_v1/controllers/requisitos/requirement_grupos_controller.dart';
 import 'package:app_bienestarmisena_v1/models/grupoRequisitos/grupoRequisitos.dart';
 import 'package:app_bienestarmisena_v1/views/grupoRequisitos/crearGrupoRequisitos.dart';
 import 'package:app_bienestarmisena_v1/views/grupoRequisitos/editarGrupoRequisitos.dart';

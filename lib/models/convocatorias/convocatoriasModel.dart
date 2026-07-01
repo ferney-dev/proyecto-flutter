@@ -68,13 +68,22 @@ class Convocatoria {
   // ============================
   // 🔹 fromJson (lee datos anidados del backend)
   // ============================
-  factory Convocatoria.fromJson(Map<String, dynamic> json) {
+  factory Convocatoria.fromJson(Map<String, dynamic> json, {String? baseUrl}) {
     // Relaciones anidadas (según estructura Sequelize)
     final linea = json['line'] ?? json['linea'] ?? {};
     final interes = json['interest'] ?? {};
     final publico = json['targetAudience'] ?? json['publicoObjetivo'] ?? {};
     final institucion = json['institution'] ?? {};
     final usuario = json['user'] ?? {};
+
+    // Procesar imageUrl: si es ruta relativa, agregar baseUrl
+    String? processedImageUrl = json['imageUrl'];
+    if (processedImageUrl != null && 
+        processedImageUrl.isNotEmpty && 
+        baseUrl != null && 
+        !processedImageUrl.startsWith('http')) {
+      processedImageUrl = '$baseUrl$processedImageUrl';
+    }
 
     return Convocatoria(
       id: json['id'] ?? 0,
@@ -88,7 +97,7 @@ class Convocatoria {
       pageUrl: json['pageUrl'] ?? '',
       objective: json['objective'] ?? '',
       notes: json['notes'] ?? '',
-      imageUrl: json['imageUrl'] ?? '',
+      imageUrl: processedImageUrl,
 
       // IDs
       institutionId: json['institutionId'] ?? institucion['id'],

@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/rol_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/rol/rol_controller.dart';
 import 'package:app_bienestarmisena_v1/models/rol/rol.dart';
 import 'package:app_bienestarmisena_v1/views/rol/crearRol.dart';
 import 'package:app_bienestarmisena_v1/views/rol/editarRol.dart';

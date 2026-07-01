@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/usuario.dart';
+import 'package:app_bienestarmisena_v1/controllers/usuario/usuario_controller.dart';
 import 'package:app_bienestarmisena_v1/models/usuarioModel/usuariosModel.dart';
 import 'package:app_bienestarmisena_v1/views/usuarios/crearUsuario.dart';
 import 'package:app_bienestarmisena_v1/views/usuarios/editarUsuario.dart';

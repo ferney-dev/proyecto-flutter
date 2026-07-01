@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/cuidadController.dart';
+import 'package:app_bienestarmisena_v1/controllers/ciudad/ciudad_controller.dart';
 import 'package:app_bienestarmisena_v1/models/cuidad/cuidad.dart';
 import 'package:app_bienestarmisena_v1/views/ciudad/crearCuidad.dart';
 import 'package:app_bienestarmisena_v1/views/ciudad/editarCuidad.dart';

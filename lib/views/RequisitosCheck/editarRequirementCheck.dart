@@ -1,6 +1,6 @@
 import 'package:app_bienestarmisena_v1/models/requerimientosChequeos/requirement_check.dart';
 import 'package:flutter/material.dart';
-import 'package:app_bienestarmisena_v1/controllers/requirement_check_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/requisitos/requirement_check_controller.dart';
 
 class ModalEditarRequirementCheck extends StatefulWidget {
   final RequirementCheck item;

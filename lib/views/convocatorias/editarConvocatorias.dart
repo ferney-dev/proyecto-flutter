@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/convocatorias.dart';
+import 'package:app_bienestarmisena_v1/controllers/convocatorias/convocatorias_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app_bienestarmisena_v1/models/convocatorias/convocatoriasModel.dart';

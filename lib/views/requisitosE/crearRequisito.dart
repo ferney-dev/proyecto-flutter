@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/requisitos_controller.dart' show RequirementsController;
+import 'package:app_bienestarmisena_v1/controllers/requisitos/requisitos_controller.dart' show RequirementsController;
 import 'package:flutter/material.dart';
 
 class ModalCrearRequirement extends StatefulWidget {

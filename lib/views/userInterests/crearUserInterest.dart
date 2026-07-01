@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:app_bienestarmisena_v1/controllers/userInterest.dart';
+import 'package:app_bienestarmisena_v1/controllers/usuario/user_interest_controller.dart';
 
 class ModalCrearUserInterest extends StatefulWidget {
   final VoidCallback onSuccess;

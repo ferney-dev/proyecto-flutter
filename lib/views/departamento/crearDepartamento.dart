@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/departamentoController.dart';
+import 'package:app_bienestarmisena_v1/controllers/departamento/departamento_controller.dart';
 import 'package:flutter/material.dart';
 
 class ModalCrearDepartment extends StatefulWidget {

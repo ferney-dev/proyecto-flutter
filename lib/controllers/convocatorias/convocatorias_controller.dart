@@ -1,9 +1,16 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:app_bienestarmisena_v1/models/convocatorias/convocatoriasModel.dart';
 
 class ConvocatoriasController {
-  final String apiUrl = "http://localhost:4000/api/v1/calls"; // Cambia por tu endpoint backend
+  late final String apiUrl;
+  late final String baseUrl;
+
+  ConvocatoriasController() {
+    apiUrl = dotenv.env['API_URL'] ?? "http://localhost:4000/api/v1/calls";
+    baseUrl = dotenv.env['IMAGE_BASE_URL'] ?? "http://localhost:4000";
+  }
 
   // ======================================================
   // 🔹 OBTENER TODAS LAS CONVOCATORIAS
@@ -14,7 +21,7 @@ class ConvocatoriasController {
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
       List<dynamic> data = jsonData["data"];
-      return data.map((item) => Convocatoria.fromJson(item)).toList();
+      return data.map((item) => Convocatoria.fromJson(item, baseUrl: baseUrl)).toList();
     } else {
       throw Exception("Error al cargar convocatorias");
     }

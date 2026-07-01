@@ -1,4 +1,4 @@
-import 'package:app_bienestarmisena_v1/controllers/departamentoController.dart';
+import 'package:app_bienestarmisena_v1/controllers/departamento/departamento_controller.dart';
 import 'package:app_bienestarmisena_v1/models/departamento/departamento.dart';
 import 'package:app_bienestarmisena_v1/views/departamento/crearDepartamento.dart';
 import 'package:app_bienestarmisena_v1/views/departamento/editarDepartamento.dart';

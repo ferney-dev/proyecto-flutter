@@ -1,9 +1,9 @@
-import 'package:app_bienestarmisena_v1/controllers/requirementGruposController.dart';
+import 'package:app_bienestarmisena_v1/controllers/requisitos/requirement_grupos_controller.dart';
 import 'package:app_bienestarmisena_v1/models/grupoRequisitos/grupoRequisitos.dart';
 import 'package:app_bienestarmisena_v1/models/requirement_categoryModel/requirement_category.dart';
 import 'package:flutter/material.dart';
 
-import 'package:app_bienestarmisena_v1/controllers/requirement_category_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/requisitos/requirement_category_controller.dart';
 
 class ModalEditarRequirementGroup extends StatefulWidget {
   final RequirementGroup group;

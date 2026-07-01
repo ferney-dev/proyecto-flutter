@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app_bienestarmisena_v1/controllers/requirement_check_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/requisitos/requirement_check_controller.dart';
 
 class ModalCrearRequirementCheck extends StatefulWidget {
   final VoidCallback onSuccess;

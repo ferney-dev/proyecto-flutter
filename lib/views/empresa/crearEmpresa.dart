@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app_bienestarmisena_v1/controllers/empresa_controller.dart';
+import 'package:app_bienestarmisena_v1/controllers/empresa/empresa_controller.dart';
 
 class ModalCrearEmpresa extends StatefulWidget {
   final VoidCallback onSuccess;

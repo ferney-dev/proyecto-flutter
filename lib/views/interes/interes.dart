@@ -1,5 +1,5 @@
 
-import 'package:app_bienestarmisena_v1/controllers/interesController.dart';
+import 'package:app_bienestarmisena_v1/controllers/interes/interes_controller.dart';
 import 'package:app_bienestarmisena_v1/models/interes/interes_model.dart';
 import 'package:app_bienestarmisena_v1/views/interes/crearInteres.dart';
 import 'package:app_bienestarmisena_v1/views/interes/editarInteres.dart';
